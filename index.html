@@ -1,0 +1,270 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 T  ransitional//EN">
+<html>
+
+	<head>
+		<title>简易富文本编辑器</title>
+		<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+	</head>
+	<style type="text/css">
+		.box {
+			border: 1px solid #ddd;
+			width: 80%;
+			margin: 20px 0 0 10%;
+			position: relative;
+			height: 400px;
+		}
+		
+		.header {
+			width: 100%;
+			height: 42px;
+			line-height: 40px;
+			background: #EEEEEE;
+		}
+		
+		.rd {
+			color: red;
+		}
+		
+		.active {
+			color: black;
+			text-shadow: #D0D0D0 0px 2px 0;
+		}
+		
+		#color {
+			width: 110px;
+			height: 60px;
+			position: absolute;
+			top: 40px;
+			border: 1px solid #ddd;
+		}
+		
+		.colorbtn {
+			width: 16px;
+			height: 16px;
+			border: none;
+			float: left;
+			margin: 4px 0 0 4px;
+		}
+		
+		#editor img {
+			width: 200px;
+			height: 200px;
+		}
+		
+		#editor {
+			width: 100%;
+			height: 352px;
+			margin-top: 6px;
+		}
+	</style>
+
+	<body>
+
+		<div class="box">
+			<div class="form-control" id="color">
+				<button class="colorbtn Btns" name="foreColor|red"></button>
+				<button class="colorbtn Btns" name="foreColor|#e28b41"></button>
+				<button class="colorbtn Btns" name="foreColor|#c8a732"></button>
+				<button class="colorbtn Btns" name="foreColor|#209361"></button>
+				<button class="colorbtn Btns" name="foreColor|#418caf"></button>
+				<button class="colorbtn Btns" name="foreColor|#aa8773"></button>
+				<button class="colorbtn Btns" name="foreColor|#999999"></button>
+				<button class="colorbtn Btns" name="foreColor|#333333"></button>
+			</div>
+			<div class="header">
+				<button class="Btns btn btn-default" name="color">颜色</button>
+				<button class="Btns btn btn-default" name="bold|null">粗体</button>
+				<button class="Btns btn btn-default" name="indent|null">缩进</button>
+				<button class="Btns btn btn-default" name="copy|null">复制</button>
+				<button class="Btns btn btn-default" name="cut|null">剪切</button>
+				<button class="Btns btn btn-default" name="delete|null">删除</button>
+				<button class="Btns btn btn-default" name="undo|null">返回</button>
+				<button class="Btns btn btn-default" name="underline|null">下划线</button>
+				<button class="Btns btn btn-default" name="removeFormat|null">删除样式</button>
+
+				<select name="fontSize" class="form-control" onChange="font()" id="selects" style="width:60px;display:inline-block">
+					<option value="1">Size1</option>
+					<option value="2">Size2</option>
+					<option value="3" selected>Size3</option>
+					<option value="4">Size4</option>
+					<option value="5">Size5</option>
+					<option value="6">Size6</option>
+					<option value="7">Size7</option>
+				</select>
+				<label for="updata" class="btn btn-default">pic</label><input type="file" name="img" id="updata" style="display: none;" />
+			</div>
+			<div id="editor">
+
+			</div>
+
+		</div>
+
+		<div class="col-sm-12" style="margin:10px 0 0 40%">
+			<button class="btn btn-default" id="printContent">打印编辑器内容</button>
+		</div>
+
+		<script src="js/jquery-1.8.3.min.js"></script>
+		<script src="js/bootstrap.min.js"></script>
+		<script type="text/javascript">
+			colorbtnhide();
+
+			//初始化
+			openOrCloseEditor("editor", "true"); //开启元素编辑
+
+			function openOrCloseEditor(el, operate) {
+				var editor = document.getElementById(el);
+				editor.contentEditable = operate;
+			};
+             
+             document.getElementById("editor").focus();
+             
+            function colorbtnhide() { //隐藏色块
+				var text_color = document.getElementById("color");
+				text_color.style.display = "none";
+			};
+
+			function font() { //设置字体大小
+				var value = document.getElementById("selects").value;
+				document.execCommand('fontSize', false, '' + value + '');
+			}
+	
+			var btns = document.getElementsByClassName("Btns");
+			for(var i of btns) {
+				i.onclick = function() { //点击高亮显示
+					var html = document.getElementById("editor").innerHTML;
+					if(html == "") {
+						return;
+					}
+					if(this.getAttribute("class").indexOf("active") > 0) {
+						if(this.getAttribute("name") == "color") {
+							colorbtnhide();
+						};
+						this.className = this.className.replace("active", "");;
+
+					} else {
+						if(this.getAttribute("name") == "color") {
+							document.getElementById("color").style.display = "block";
+							for(var n of btns) {
+								n.className = n.className.replace("active", "");;
+							}
+							this.className = this.className + " active";
+						} else {
+							colorbtnhide();
+
+							if(this.getAttribute("name").indexOf("bold") > -1) {
+								for(var n of btns) {
+									n.className = n.className.replace("active", "");;
+								}
+							}
+							this.className = this.className + " active";
+						}
+					}
+					var name = this.getAttribute("name");
+					if(name == null) {
+						return;
+					}
+					var name_1 = name.split("|"),
+						name_2 = name_1[0],
+						name_3 = name_1[1];
+					document.execCommand('' + name_2 + '', false, '' + name_3 + '');
+				}
+			};
+			var colorbtn = document.getElementsByClassName("colorbtn");
+			for(var i of colorbtn) {
+				var name = i.getAttribute("name"),
+					name_1 = name.split("|"),
+					name_3 = name_1[1];
+				i.style.background = '' + name_3 + '';
+			}
+
+			$('#updata').bind('change', function() {
+				var fv = this.files[0].size; //火狐等标准取值办法
+				var num = Math.ceil(fv / 1000);
+				var that = this.files[0];
+				var reg = new RegExp("[\\u4E00-\\u9FFF]+", "g");　　
+				if(reg.test(that.name)) {
+					alert("上传的图片不能包含汉字哦！");
+					return;
+				}
+				if(num > 500) {
+					alert("您上传的图片" + num + "kb不可以超过500kb哦");
+				} else {
+					$Upload(this.files[0], function(data) {
+						if(data.code == 'success') {
+							var imgSrcs = $KeyUrl + '/resource/redirect?key=' + data.data.key;
+							$('#editor').append("<img src='" + imgSrcs + "' data-key='" + data.data.key + "'/><br>");
+						} else {
+							alert("上传失败");
+						}
+					});
+				};
+			})
+			//上传7牛云
+			var locations = location.href;
+			var address;
+			if(locations.indexOf('.zbj.') > -1) {
+				address = 'http://rms.zbj.com';
+			} else if(locations.indexOf('.stage.') > -1) {
+				address = 'http://zbjrms.stage.zbjdev.com';
+			} else {
+				address = 'http://zbjrms.t10.zbjdev.com';
+			}
+			var $KeyUrl = address;
+			var $Upload = function(file, success) {
+				var getKey = function(callback) {
+					var param = {
+						belongToDomain: 'mobile',
+						belongToSystem: 'newwap',
+						name: file.name
+					};
+					var url = $KeyUrl + '/resource/getUploadParamJsonp';
+					$.ajax({
+						url: url,
+						data: param,
+						dataType: 'jsonp',
+						jsonp: 'jsonpCallback',
+						success: function(json) {
+							if(json.success) {
+								callback({
+									key: json.data[0].key,
+									token: json.data[0].token
+								})
+							} else {
+								alert('图片命名不符合');
+							}
+						}
+					});
+				};
+				getKey(function(keyObj) {
+					var qiniuyunUrl = 'http://upload.qiniu.com/';
+					var data = new FormData();
+					data.append('key', keyObj.key);
+					data.append('token', keyObj.token);
+					data.append('file', file);
+					$.ajax({
+						url: qiniuyunUrl,
+						type: 'post',
+						data: data,
+						cache: false,
+						contentType: false,
+						processData: false,
+						success: function(data) {
+							success(data);
+						},
+						error: function() {
+							console.info('error');
+						}
+					});
+				});
+			}
+			var btn = document.getElementById("printContent");
+			btn.onclick = function() {
+				var html = document.getElementById("editor").innerHTML;
+				console.log(html);
+
+			};
+		</script>
+	</body>
+
+</html>
